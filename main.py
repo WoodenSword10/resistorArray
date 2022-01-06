@@ -54,6 +54,106 @@ class Read_data_1(QThread):
                     self.changeforce.emit(i, changevalue)
         pass
 
+class Read_data_2(QThread):
+    changeforce = pyqtSignal(int, int)
+    '''
+    子进程，用于读取数据
+    '''
+    def __init__(self, port):
+        super(Read_data_2, self).__init__()
+        self.port = port
+        self.old = np.array(re.findall('\d+', str(self.port.readline()))).astype(int)
+
+    def run(self):
+        while True:
+            # self.dat
+            data = str(self.port.readline())
+            # print(data, type(data))
+            # print(re.findall('\d+', data))
+            self.data = np.array(re.findall('\d+', data))
+            self.data = self.data.astype(int)
+            # print(self.data)
+            for i in range(5):
+                if self.data[i] != self.old[i]:
+                    changevalue = self.data[i] - self.old[i]
+                    self.changeforce.emit(i, changevalue)
+        pass
+
+class Read_data_3(QThread):
+    changeforce = pyqtSignal(int, int)
+    '''
+    子进程，用于读取数据
+    '''
+    def __init__(self, port):
+        super(Read_data_3, self).__init__()
+        self.port = port
+        self.old = np.array(re.findall('\d+', str(self.port.readline()))).astype(int)
+
+    def run(self):
+        while True:
+            # self.dat
+            data = str(self.port.readline())
+            # print(data, type(data))
+            # print(re.findall('\d+', data))
+            self.data = np.array(re.findall('\d+', data))
+            self.data = self.data.astype(int)
+            # print(self.data)
+            for i in range(5):
+                if self.data[i] != self.old[i]:
+                    changevalue = self.data[i] - self.old[i]
+                    self.changeforce.emit(i, changevalue)
+        pass
+
+class Read_data_4(QThread):
+    changeforce = pyqtSignal(int, int)
+    '''
+    子进程，用于读取数据
+    '''
+    def __init__(self, port):
+        super(Read_data_4, self).__init__()
+        self.port = port
+        self.old = np.array(re.findall('\d+', str(self.port.readline()))).astype(int)
+
+    def run(self):
+        while True:
+            # self.dat
+            data = str(self.port.readline())
+            # print(data, type(data))
+            # print(re.findall('\d+', data))
+            self.data = np.array(re.findall('\d+', data))
+            self.data = self.data.astype(int)
+            # print(self.data)
+            for i in range(5):
+                if self.data[i] != self.old[i]:
+                    changevalue = self.data[i] - self.old[i]
+                    self.changeforce.emit(i, changevalue)
+        pass
+
+class Read_data_5(QThread):
+    changeforce = pyqtSignal(int, int)
+    '''
+    子进程，用于读取数据
+    '''
+    def __init__(self, port):
+        super(Read_data_5, self).__init__()
+        self.port = port
+        self.old = np.array(re.findall('\d+', str(self.port.readline()))).astype(int)
+
+    def run(self):
+        while True:
+            # self.dat
+            data = str(self.port.readline())
+            # print(data, type(data))
+            # print(re.findall('\d+', data))
+            self.data = np.array(re.findall('\d+', data))
+            self.data = self.data.astype(int)
+            # print(self.data)
+            for i in range(5):
+                if self.data[i] != self.old[i]:
+                    changevalue = self.data[i] - self.old[i]
+                    self.changeforce.emit(i, changevalue)
+        pass
+
 class begin(QMainWindow, begin_UI.Ui_Dialog):
     baud = ['9600', '115200']
     def __init__(self):
@@ -76,10 +176,10 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
     def myconnect(self):
         try:
             self.port1 = serial.Serial(self.comboBox.currentText(), self.comboBox_2.currentText())
-            # self.port2 = serial.Serial(self.comboBox_3.currentText(), self.comboBox_4.currentText())
-            # self.port3 = serial.Serial(self.comboBox_5.currentText(), self.comboBox_6.currentText())
-            # self.port4 = serial.Serial(self.comboBox_7.currentText(), self.comboBox_8.currentText())
-            # self.port5 = serial.Serial(self.comboBox_9.currentText(), self.comboBox_10.currentText())
+            self.port2 = serial.Serial(self.comboBox_3.currentText(), self.comboBox_4.currentText())
+            self.port3 = serial.Serial(self.comboBox_5.currentText(), self.comboBox_6.currentText())
+            self.port4 = serial.Serial(self.comboBox_7.currentText(), self.comboBox_8.currentText())
+            self.port5 = serial.Serial(self.comboBox_9.currentText(), self.comboBox_10.currentText())
         except:
             box = QMessageBox()
             box.setText('<h1><center>连接失败！！！</center></h1>')
@@ -159,19 +259,84 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.thread2 = Read_data_1(beginWin.port1)
         self.thread2.changeforce.connect(self.ChangeForce1)
         self.thread2.start()
+        self.thread3 = Read_data_2(beginWin.port2)
+        self.thread3.changeforce.connect(self.ChangeForce2)
+        self.thread3.start()
+        self.thread4 = Read_data_3(beginWin.port3)
+        self.thread4.changeforce.connect(self.ChangeForce3)
+        self.thread4.start()
+        self.thread5 = Read_data_4(beginWin.port4)
+        self.thread5.changeforce.connect(self.ChangeForce4)
+        self.thread5.start()
+        self.thread6 = Read_data_5(beginWin.port5)
+        self.thread6.changeforce.connect(self.ChangeForce5)
+        self.thread6.start()
+
+
+    def ChangeForce5(self, i, changevalue):
+        if i == 0:
+            # print(changevalue, type(changevalue), str(changevalue))
+            self.lineEdit_21.setText(str(changevalue))
+        if i == 1:
+            self.lineEdit_16.setText(str(changevalue))
+        if i == 2:
+            self.lineEdit_11.setText(str(changevalue))
+        if i == 3:
+            self.lineEdit_6.setText(str(changevalue))
+        if i == 4:
+            self.lineEdit_1.setText(str(changevalue))
 
     def ChangeForce1(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
-            self.lineEdit_1.setText(str(changevalue))
+            self.lineEdit_25.setText(str(changevalue))
         if i == 1:
-            self.lineEdit_2.setText(str(changevalue))
+            self.lineEdit_20.setText(str(changevalue))
         if i == 2:
-            self.lineEdit_3.setText(str(changevalue))
+            self.lineEdit_15.setText(str(changevalue))
         if i == 3:
-            self.lineEdit_4.setText(str(changevalue))
+            self.lineEdit_10.setText(str(changevalue))
         if i == 4:
             self.lineEdit_5.setText(str(changevalue))
+
+    def ChangeForce2(self, i, changevalue):
+        if i == 0:
+            # print(changevalue, type(changevalue), str(changevalue))
+            self.lineEdit_24.setText(str(changevalue))
+        if i == 1:
+            self.lineEdit_19.setText(str(changevalue))
+        if i == 2:
+            self.lineEdit_14.setText(str(changevalue))
+        if i == 3:
+            self.lineEdit_9.setText(str(changevalue))
+        if i == 4:
+            self.lineEdit_4.setText(str(changevalue))
+
+    def ChangeForce3(self, i, changevalue):
+        if i == 0:
+            # print(changevalue, type(changevalue), str(changevalue))
+            self.lineEdit_23.setText(str(changevalue))
+        if i == 1:
+            self.lineEdit_18.setText(str(changevalue))
+        if i == 2:
+            self.lineEdit_13.setText(str(changevalue))
+        if i == 3:
+            self.lineEdit_8.setText(str(changevalue))
+        if i == 4:
+            self.lineEdit_3.setText(str(changevalue))
+
+    def ChangeForce4(self, i, changevalue):
+        if i == 0:
+            # print(changevalue, type(changevalue), str(changevalue))
+            self.lineEdit_22.setText(str(changevalue))
+        if i == 1:
+            self.lineEdit_17.setText(str(changevalue))
+        if i == 2:
+            self.lineEdit_12.setText(str(changevalue))
+        if i == 3:
+            self.lineEdit_7.setText(str(changevalue))
+        if i == 4:
+            self.lineEdit_2.setText(str(changevalue))
 
     def paint(self):
         self.SurfFigure = Figure_Canvas()
