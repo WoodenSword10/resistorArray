@@ -1,5 +1,7 @@
 import re
 import sys
+import time
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget, QSizePolicy, QSlider, QLabel
@@ -10,11 +12,15 @@ from PyQt5.QtDataVisualization import Q3DBars, QBar3DSeries, QValue3DAxis, QCate
 import main_UI
 import begin_UI
 import numpy as np
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QSize
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QSize, QTimer
 import serial
 import serial.tools.list_ports
 
+# 串口列表获取线程
 class Find_port(QThread):
+    '''
+    寻找串口线程
+    '''
     port_change = pyqtSignal()
 
     def __init__(self):
@@ -29,6 +35,7 @@ class Find_port(QThread):
                 self.port_change.emit()
                 QThread.msleep(1000)
 
+# 获取串口数据线程
 class Read_data_1(QThread):
     changeforce = pyqtSignal(int, int)
     '''
@@ -159,13 +166,20 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
     def __init__(self):
         super(begin, self).__init__()
         self.setupUi(self)
+        # 按钮点击事件处理函数，即连接上所有串口
         self.pushButton.clicked.connect(self.myconnect)
+        # 初始化波特率
         self.init_baud()
+        # 初始化串口
         self.port_find()
+        # 实例化寻找串口线程
         self.thread1 = Find_port()
+        # 串口发生变化信号处理函数
         self.thread1.port_change.connect(self.port_find)
+        # 线程运行
         self.thread1.start()
 
+    # 初始化波特率
     def init_baud(self):
         self.comboBox_2.addItems(self.baud)
         self.comboBox_4.addItems(self.baud)
@@ -173,13 +187,15 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
         self.comboBox_8.addItems(self.baud)
         self.comboBox_10.addItems(self.baud)
 
+    # 链接串口，成功则跳转页面
     def myconnect(self):
         try:
-            self.port1 = serial.Serial(self.comboBox.currentText(), self.comboBox_2.currentText())
-            self.port2 = serial.Serial(self.comboBox_3.currentText(), self.comboBox_4.currentText())
-            self.port3 = serial.Serial(self.comboBox_5.currentText(), self.comboBox_6.currentText())
-            self.port4 = serial.Serial(self.comboBox_7.currentText(), self.comboBox_8.currentText())
-            self.port5 = serial.Serial(self.comboBox_9.currentText(), self.comboBox_10.currentText())
+            True
+            # self.port1 = serial.Serial(self.comboBox.currentText(), self.comboBox_2.currentText())
+            # self.port2 = serial.Serial(self.comboBox_3.currentText(), self.comboBox_4.currentText())
+            # self.port3 = serial.Serial(self.comboBox_5.currentText(), self.comboBox_6.currentText())
+            # self.port4 = serial.Serial(self.comboBox_7.currentText(), self.comboBox_8.currentText())
+            # self.port5 = serial.Serial(self.comboBox_9.currentText(), self.comboBox_10.currentText())
         except:
             box = QMessageBox()
             box.setText('<h1><center>连接失败！！！</center></h1>')
@@ -193,6 +209,7 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
             self.mainwin.show()
         pass
 
+    # 初始化串口及线程串口变化信号处理函数
     def port_find(self):
         self.comboBox.clear()
         self.comboBox_3.clear()
@@ -205,6 +222,7 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
             pattern = re.compile('COM[\d]*')
             item = pattern.findall(str(item))[0]
             list1.append(item)
+            print(item)
         list1.sort()
         self.comboBox.addItems(list1)
         self.comboBox_3.addItems(list1)
@@ -212,12 +230,14 @@ class begin(QMainWindow, begin_UI.Ui_Dialog):
         self.comboBox_7.addItems(list1)
         self.comboBox_9.addItems(list1)
 
+#
 class Figure_Canvas(FigureCanvas):
     def __init__(self, parent=None, width=3.9, height=2.7, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=100)
         super(Figure_Canvas, self).__init__(self.fig)
         self.ax = self.fig.add_subplot(111)
 
+# 主界面
 class main_ui(QMainWindow, main_UI.Ui_Dialog):
 
     my_row = ('第一列', '第二列', '第三列', '第四列', '第五列')
@@ -226,10 +246,30 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
     def __init__(self):
         super(main_ui, self).__init__()
         self.setupUi(self)
+        # 存储数据矩阵
         self.data = np.zeros(shape=(5, 5))
+        # 初始状态显示
+        self.textBrowser.setText('空闲')
+        # 阵列触发标志
+        self.i = 0
+        # 阵列触发时间
+        self.beginTime = 0
+        # 阵列使用时间
+        self.Dtime = 0
+        self.day = 0
+        self.hour = 0
+        self.mintue = 0
+        # 定时器
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.countTime)
+        self.timer.start(1000)
+        # 初始化数据矩阵，即读取相应位置的文本内容
         self.make_list()
+        # 初始化视角旋转工具
         self.init_xuanz()
+        # 绘制三维柱状图
         self.D3DBar()
+        # 文本编辑框内容变化事件处理函数
         self.lineEdit_1.textChanged.connect(self.reprint)
         self.lineEdit_2.textChanged.connect(self.reprint)
         self.lineEdit_3.textChanged.connect(self.reprint)
@@ -255,24 +295,26 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.lineEdit_23.textChanged.connect(self.reprint)
         self.lineEdit_24.textChanged.connect(self.reprint)
         self.lineEdit_25.textChanged.connect(self.reprint)
+        # 视角复位按钮点击事件处理函数
         self.pushButton.clicked.connect(self.reback)
-        self.thread2 = Read_data_1(beginWin.port1)
-        self.thread2.changeforce.connect(self.ChangeForce1)
-        self.thread2.start()
-        self.thread3 = Read_data_2(beginWin.port2)
-        self.thread3.changeforce.connect(self.ChangeForce2)
-        self.thread3.start()
-        self.thread4 = Read_data_3(beginWin.port3)
-        self.thread4.changeforce.connect(self.ChangeForce3)
-        self.thread4.start()
-        self.thread5 = Read_data_4(beginWin.port4)
-        self.thread5.changeforce.connect(self.ChangeForce4)
-        self.thread5.start()
-        self.thread6 = Read_data_5(beginWin.port5)
-        self.thread6.changeforce.connect(self.ChangeForce5)
-        self.thread6.start()
+        # 实例化串口数据读取线程2-6
+        # self.thread2 = Read_data_1(beginWin.port1)
+        # self.thread2.changeforce.connect(self.ChangeForce1)
+        # self.thread2.start()
+        # self.thread3 = Read_data_2(beginWin.port2)
+        # self.thread3.changeforce.connect(self.ChangeForce2)
+        # self.thread3.start()
+        # self.thread4 = Read_data_3(beginWin.port3)
+        # self.thread4.changeforce.connect(self.ChangeForce3)
+        # self.thread4.start()
+        # self.thread5 = Read_data_4(beginWin.port4)
+        # self.thread5.changeforce.connect(self.ChangeForce4)
+        # self.thread5.start()
+        # self.thread6 = Read_data_5(beginWin.port5)
+        # self.thread6.changeforce.connect(self.ChangeForce5)
+        # self.thread6.start()
 
-
+    # 线程数据变化信号处理函数
     def ChangeForce5(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
@@ -286,6 +328,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if i == 4:
             self.lineEdit_1.setText(str(changevalue))
 
+    # 线程数据变化信号处理函数
     def ChangeForce1(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
@@ -299,6 +342,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if i == 4:
             self.lineEdit_5.setText(str(changevalue))
 
+    # 线程数据变化信号处理函数
     def ChangeForce2(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
@@ -312,6 +356,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if i == 4:
             self.lineEdit_4.setText(str(changevalue))
 
+    # 线程数据变化信号处理函数
     def ChangeForce3(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
@@ -325,6 +370,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if i == 4:
             self.lineEdit_3.setText(str(changevalue))
 
+    # 线程数据变化信号处理函数
     def ChangeForce4(self, i, changevalue):
         if i == 0:
             # print(changevalue, type(changevalue), str(changevalue))
@@ -338,6 +384,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if i == 4:
             self.lineEdit_2.setText(str(changevalue))
 
+    # 绘制三维折线图函数，弃用
     def paint(self):
         self.SurfFigure = Figure_Canvas()
 
@@ -362,11 +409,13 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.ax3d.set_zlabel("z")
         self.figure = self.ax3d.plot(self.X, self.Y, self.Z, c='r')
 
+    # 复位按钮功能
     def reback(self):
         self.m_graph.scene().activeCamera().setCameraPreset(self.m_preset)
         # self.rotationSliderX.value(0)
         # self.rotationSlidery.value(0)
 
+    # 三维柱状图绘制
     def D3DBar(self):
         self.m_graph = Q3DBars()
         self.m_xRotation = 0.0  # 水平旋转角度
@@ -443,15 +492,47 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         layout.addWidget(container)
         widget.show()
 
+    # 更新柱状图数据
     def reprint(self):
         self.make_list()
+        if self.data.mean() > 20:
+            print('a')
+            self.i = 1
+            self.beginTime = time.time()
+            print('c')
+        else:
+            if self.i == 1:
+                self.timer.stop()
+            self.i = 0
+            self.beginTime = 0
+            self.Dtime = 0
+            self.textBrowser.setText('空闲')
         self.data2 = self.data.tolist()
         dataSet = []
         for row in self.data2:
             dataSet.append([QBarDataItem(v) for v in row])
-
         self.m_primarySeries.dataProxy().resetArray(dataSet, self.my_col, self.my_row)
 
+    # 计算使用时间
+    def countTime(self):
+        # print('b')
+        if self.beginTime != 0:
+            newTime = time.time()
+            self.Dtime = int(newTime - self.beginTime)
+            if self.Dtime >= 60:
+                self.mintue += 1
+                self.Dtime -= 60 * self.mintue + 60 * 60 * self.hour
+            if self.mintue == 60:
+                self.hour += 1
+                self.mintue -= 60
+            if self.hour != 0:
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.hour) + '小时' + str(self.mintue) + '分钟' + str(self.Dtime) + '秒')
+            elif self.mintue != 0:
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.mintue) + '分钟' + str(self.Dtime) + '秒')
+            else:
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.Dtime) + '秒')
+
+    # 字符串转化为整型函数
     def toint(self, str):
         try:
             res = int(str)
@@ -460,6 +541,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         else:
             return res
 
+    # 根据文本框阵列拼凑数据矩阵
     def make_list(self):
         self.data[0][0] = self.toint(self.lineEdit_1.text())
         self.data[0][1] = self.toint(self.lineEdit_2.text())
@@ -487,6 +569,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.data[4][3] = self.toint(self.lineEdit_24.text())
         self.data[4][4] = self.toint(self.lineEdit_25.text())
 
+    # 视角旋转初始化
     def init_xuanz(self):
         self.rotationSliderX = QSlider(Qt.Horizontal)
         self.rotationSliderX.setTickInterval(30)
@@ -508,11 +591,13 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.rotationSliderX.valueChanged.connect(self.rotateX)
         self.rotationSliderY.valueChanged.connect(self.rotateY)
 
+    # X轴旋转
     def rotateX(self, rotation):
         self.m_xRotation = rotation
         self.m_graph.scene().activeCamera().setCameraPosition(
             self.m_xRotation, self.m_yRotation)
 
+    # Y轴旋转
     def rotateY(self, rotation):
         self.m_yRotation = rotation
         self.m_graph.scene().activeCamera().setCameraPosition(
