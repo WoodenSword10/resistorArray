@@ -240,8 +240,8 @@ class Figure_Canvas(FigureCanvas):
 # 主界面
 class main_ui(QMainWindow, main_UI.Ui_Dialog):
 
-    my_row = ('第一列', '第二列', '第三列', '第四列', '第五列')
-    my_col = ('第一行', '第二行', '第三行', '第四行', '第五行')
+    my_row = ('col 1', 'col 2', 'col 3', 'col 4', 'col 5')
+    my_col = ('row 1', 'row 2', 'row 3', 'row 4', 'row 5')
 
     def __init__(self):
         super(main_ui, self).__init__()
@@ -249,7 +249,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         # 存储数据矩阵
         self.data = np.zeros(shape=(5, 5))
         # 初始状态显示
-        self.textBrowser.setText('空闲')
+        self.textBrowser.setText('vacant')
         # 阵列触发标志
         self.i = 0
         # 阵列触发时间
@@ -423,7 +423,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.m_segments = 4
         self.m_subSegments = 3
         self.m_minval = 0
-        self.m_maxval = 1024
+        self.m_maxval = 5120000
         self.m_temperatureAxis = QValue3DAxis()  # 温度轴
         self.m_yearAxis = QCategory3DAxis()  # 年份轴
         self.m_monthAxis = QCategory3DAxis()  # 月份轴
@@ -452,8 +452,8 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.m_temperatureAxis.setRange(self.m_minval, self.m_maxval)
         self.m_temperatureAxis.setLabelFormat(u"%.1fV")
 
-        self.m_yearAxis.setTitle("行数")
-        self.m_monthAxis.setTitle("列数")
+        self.m_yearAxis.setTitle("row")
+        self.m_monthAxis.setTitle("col")
 
         self.m_graph.setValueAxis(self.m_temperatureAxis)
         # 设置活动行的轴为年份
@@ -462,7 +462,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.m_graph.setColumnAxis(self.m_monthAxis)
 
         self.m_primarySeries.setItemLabelFormat(
-            "数据 - @colLabel @rowLabel: @valueLabel")
+            "data - @colLabel @rowLabel: @valueLabel")
 
         # 设置网格类型
         self.m_primarySeries.setMesh(QAbstract3DSeries.MeshBevelBar)
@@ -504,7 +504,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
             self.i = 0
             self.beginTime = 0
             self.Dtime = 0
-            self.textBrowser.setText('空闲')
+            self.textBrowser.setText('vacant')
         self.data2 = self.data.tolist()
         dataSet = []
         for row in self.data2:
@@ -521,11 +521,11 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
             self.mintue = int(self.Dtime/60) - 24*self.hour
             self.second = self.Dtime - 3600 * self.hour - 60 * self.mintue
             if self.hour != 0:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.hour) + '小时' + str(self.mintue) + '分钟' + str(self.second) + '秒')
+                self.textBrowser.setText('in use, Usage duration is ' + str(self.hour) + 'h' + str(self.mintue) + 'm' + str(self.second) + 's')
             elif self.mintue != 0:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.mintue) + '分钟' + str(self.second) + '秒')
+                self.textBrowser.setText('in use, Usage duration is ' + str(self.mintue) + 'h' + str(self.second) + 's')
             else:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.second) + '秒')
+                self.textBrowser.setText('in use, Usage duration is ' + str(self.second) + 's')
 
     # 字符串转化为整型函数
     def toint(self, str):
@@ -538,6 +538,7 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
 
     # 根据文本框阵列拼凑数据矩阵
     def make_list(self):
+        # r = 5120000/X - 1000
         self.data[0][0] = self.toint(self.lineEdit_1.text())
         self.data[0][1] = self.toint(self.lineEdit_2.text())
         self.data[0][2] = self.toint(self.lineEdit_3.text())

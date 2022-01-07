@@ -28,10 +28,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>30</y>
-     <width>400</width>
-     <height>31</height>
+     <x>80</x>
+     <y>20</y>
+     <width>831</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="font">
@@ -44,7 +44,7 @@
     <string notr="true"/>
    </property>
    <property name="text">
-    <string>电阻传感器阵列显示demo</string>
+    <string>Micro/Nano Electronic Devices Research group</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -60,15 +60,15 @@
     </rect>
    </property>
    <property name="title">
-    <string>状态</string>
+    <string>state</string>
    </property>
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>20</y>
       <width>241</width>
-      <height>41</height>
+      <height>61</height>
      </rect>
     </property>
     <property name="font">
@@ -84,27 +84,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>10</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>坐姿</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
@@ -116,7 +95,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="title">
-    <string>数据</string>
+    <string>data</string>
    </property>
    <widget class="QLineEdit" name="lineEdit_1">
     <property name="geometry">
@@ -666,7 +645,7 @@ p, li { white-space: pre-wrap; }
     </size>
    </property>
    <property name="title">
-    <string>绘图</string>
+    <string>painting</string>
    </property>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
@@ -678,7 +657,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>复位</string>
+     <string>Reset</string>
     </property>
    </widget>
    <widget class="QWidget" name="widget" native="true">
@@ -702,7 +681,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="title">
-    <string>视图旋转</string>
+    <string>view rotation</string>
    </property>
   </widget>
  </widget>
