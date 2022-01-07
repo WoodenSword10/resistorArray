@@ -32,7 +32,7 @@ class Ui_Dialog(object):
         self.textBrowser = QtWidgets.QTextBrowser(self.groupBox)
         self.textBrowser.setGeometry(QtCore.QRect(10, 40, 241, 41))
         font = QtGui.QFont()
-        font.setPointSize(15)
+        font.setPointSize(12)
         self.textBrowser.setFont(font)
         self.textBrowser.setObjectName("textBrowser")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
@@ -243,6 +243,11 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "电阻传感器阵列显示demo"))
         self.groupBox.setTitle(_translate("Dialog", "状态"))
+        self.textBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.label_2.setText(_translate("Dialog", "坐姿"))
         self.groupBox_2.setTitle(_translate("Dialog", "数据"))
         self.lineEdit_1.setText(_translate("Dialog", "1"))

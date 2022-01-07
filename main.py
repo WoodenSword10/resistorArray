@@ -256,13 +256,12 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         self.beginTime = 0
         # 阵列使用时间
         self.Dtime = 0
-        self.day = 0
         self.hour = 0
-        self.mintue = 0
+        self.miutue = 0
+        self.second = 0
         # 定时器
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.countTime)
-        self.timer.start(1000)
         # 初始化数据矩阵，即读取相应位置的文本内容
         self.make_list()
         # 初始化视角旋转工具
@@ -496,10 +495,9 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
     def reprint(self):
         self.make_list()
         if self.data.mean() > 20:
-            print('a')
             self.i = 1
             self.beginTime = time.time()
-            print('c')
+            self.timer.start(1000)
         else:
             if self.i == 1:
                 self.timer.stop()
@@ -519,18 +517,15 @@ class main_ui(QMainWindow, main_UI.Ui_Dialog):
         if self.beginTime != 0:
             newTime = time.time()
             self.Dtime = int(newTime - self.beginTime)
-            if self.Dtime >= 60:
-                self.mintue += 1
-                self.Dtime -= 60 * self.mintue + 60 * 60 * self.hour
-            if self.mintue == 60:
-                self.hour += 1
-                self.mintue -= 60
+            self.hour = int(self.Dtime/3600)
+            self.mintue = int(self.Dtime/60) - 24*self.hour
+            self.second = self.Dtime - 3600 * self.hour - 60 * self.mintue
             if self.hour != 0:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.hour) + '小时' + str(self.mintue) + '分钟' + str(self.Dtime) + '秒')
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.hour) + '小时' + str(self.mintue) + '分钟' + str(self.second) + '秒')
             elif self.mintue != 0:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.mintue) + '分钟' + str(self.Dtime) + '秒')
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.mintue) + '分钟' + str(self.second) + '秒')
             else:
-                self.textBrowser.setText('使用中，使用时长为：' + str(self.Dtime) + '秒')
+                self.textBrowser.setText('使用中，使用时长为：' + str(self.second) + '秒')
 
     # 字符串转化为整型函数
     def toint(self, str):
